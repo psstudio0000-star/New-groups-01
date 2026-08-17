@@ -346,7 +346,7 @@
       color: #e2e8f0;
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       line-height: 1.5;
     }
 
@@ -373,6 +373,14 @@
       font-size: 15px;
       font-weight: 800;
       cursor: pointer;
+    }
+
+    .inline-error {
+      color: #f87171;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: none;
     }
   </style>
 </head>
@@ -416,16 +424,18 @@
   <div class="modal-overlay" id="shareModal">
     <div class="modal-box">
       <div class="share-icon-wrapper">⚠️</div>
-      <div class="share-count-text">Opps! You haven't shared 3 links 🔗</div>
+      <div class="share-count-text">Share Required 🔗</div>
       <div class="share-instruction">
-        Please share this link to <b>3 Telegram groups/friends</b> to get instant access!
+        Pehle niche diye gaye <b>SHARE</b> button par click karke groups mein send karein!
       </div>
       
+      <div id="modal-error-msg" class="inline-error">❌ Pehle SHARE button par click karein!</div>
+
       <a class="share-link-btn" href="https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2Bcs76HfenGYI4MWQ1&text=JOIN%20THIS%20AMAZING%20GROUP%20%F0%9F%A5%B5" target="_blank" onclick="registerShareClick()">
-        📲 SHARE TO 3 GROUPS
+        📲 SHARE TO GROUPS
       </a>
 
-      <button class="ok-btn" onclick="handleModalOkClick()">▶ WATCH NOW FULL HD</button>
+      <button id="modal-ok-btn" class="ok-btn" onclick="handleModalOkClick()">▶ WATCH NOW FULL HD</button>
     </div>
   </div>
 
@@ -473,13 +483,12 @@
         try {
           const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
 
-          // 8 Second Safety Timeout (In case ad hangs during load)
           const adTimeout = setTimeout(() => {
             isWaiting = false;
             const unlockBtn = document.getElementById('unlock-btn');
             unlockBtn.disabled = false;
             unlockBtn.innerText = "⚠️ No Ad Fill. Tap to Retry!";
-          }, 8000);
+          }, 7000);
 
           AdController.show()
             .then((result) => {
@@ -494,15 +503,15 @@
                 isWaiting = false;
                 showShareModal();
               } else {
-                startCoolDownBuffer("⏳ Next Key ready in", 7);
+                startCoolDownBuffer("⏳ Next Key ready in", 5);
               }
             })
             .catch((error) => {
               clearTimeout(adTimeout);
-              startCoolDownBuffer("⚠️ Ad missed, retry in", 8);
+              startCoolDownBuffer("⚠️ Ad missed, retry in", 6);
             });
         } catch (err) {
-          startCoolDownBuffer("⏳ Slow connection, retry in", 6);
+          startCoolDownBuffer("⏳ Slow connection, retry in", 5);
         }
       } else {
         startCoolDownBuffer("⏳ Loading SDK, retry in", 5);
@@ -562,15 +571,14 @@
 
     function registerShareClick() {
       hasShared = true;
+      document.getElementById('modal-error-msg').style.display = 'none';
+      const okBtn = document.getElementById('modal-ok-btn');
+      okBtn.innerText = "✅ UNLOCKED! WATCH NOW";
     }
 
     function handleModalOkClick() {
       if (!hasShared) {
-        if (tg && tg.showAlert) {
-          tg.showAlert("❌ Opps! You haven't shared to 3 groups yet. Please click SHARE first!");
-        } else {
-          alert("❌ Opps! You haven't shared to 3 groups yet. Please click SHARE first!");
-        }
+        document.getElementById('modal-error-msg').style.display = 'block';
         return;
       }
 
