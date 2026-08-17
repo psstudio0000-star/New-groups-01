@@ -1,169 +1,587 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HD Premium Video Player</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>HD Premium Video Player</title>
 
-    <!-- Telegram Web App SDK -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
-    <!-- Adsgram SDK -->
-    <script id="adsgram-script" src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Adsgram SDK -->
+  <script id="adsgram-script" src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, Helvetica, Arial, sans-serif;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-        body {
-            background-color: #090d16;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-        }
+    body {
+      background: radial-gradient(circle at top, #1e1b4b 0%, #090d16 60%, #030712 100%);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 16px;
+      overflow-x: hidden;
+    }
 
-        .card {
-            background: #121824;
-            border-radius: 20px;
-            padding: 24px;
-            width: 100%;
-            max-width: 360px;
-            text-align: center;
-            border: 1px solid #1e293b;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7);
-        }
+    .background-glow {
+      position: absolute;
+      width: 280px;
+      height: 280px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.28) 0%, rgba(0,0,0,0) 70%);
+      top: 5%;
+      z-index: 0;
+      will-change: transform;
+      animation: float 6s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
+    }
 
-        .icon-box {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, #0088cc, #005588);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px auto;
-            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
-        }
+    @keyframes float {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(0, -25px, 0); }
+    }
 
-        .icon-box svg {
-            width: 32px;
-            height: 32px;
-            fill: #ffffff;
-        }
+    .card {
+      position: relative;
+      z-index: 1;
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 28px;
+      padding: 24px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(99, 102, 241, 0.2);
+    }
 
-        h2 {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: #ffffff;
-        }
+    .player-preview {
+      width: 100%;
+      height: 195px;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%), 
+                  url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&auto=format&fit=crop') center/cover;
+      border-radius: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      overflow: hidden;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
+    }
 
-        p {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
+    .play-wrapper {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
 
-        .btn-ad {
-            background: linear-gradient(135deg, #0088cc, #006699);
-            color: #ffffff;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
+    .play-wrapper:active {
+      transform: scale(0.92);
+    }
 
-        .btn-ad:active {
-            transform: scale(0.98);
-        }
+    .play-pulse-ring {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.45);
+      will-change: transform, opacity;
+      animation: ringPulse 2.2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+    }
 
-        .status-msg {
-            margin-top: 16px;
-            font-size: 13px;
-            display: none;
-            padding: 10px;
-            border-radius: 8px;
-        }
+    @keyframes ringPulse {
+      0% { transform: scale(0.85); opacity: 0.9; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
 
-        .status-success {
-            background: rgba(34, 197, 94, 0.1);
-            color: #4ade80;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
+    .play-icon {
+      position: relative;
+      z-index: 2;
+      width: 62px;
+      height: 62px;
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.85);
+    }
 
-        .status-error {
-            background: rgba(239, 68, 68, 0.1);
-            color: #f87171;
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-    </style>
+    .play-icon::after {
+      content: '';
+      width: 0;
+      height: 0;
+      border-style: solid;
+      border-width: 11px 0 11px 19px;
+      border-color: transparent transparent transparent #ffffff;
+      margin-left: 5px;
+    }
+
+    .video-status-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(10px);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 6px 12px;
+      border-radius: 20px;
+      color: #f87171;
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .quality-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: rgba(99, 102, 241, 0.85);
+      backdrop-filter: blur(10px);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 5px 9px;
+      border-radius: 8px;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #ef4444;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #ef4444;
+      animation: blink 1.2s ease-in-out infinite;
+    }
+
+    @keyframes blink { 50% { opacity: 0.3; } }
+
+    .video-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      margin-bottom: 6px;
+      color: #f8fafc;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .video-subtext {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin-bottom: 18px;
+    }
+
+    .steps-grid {
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+
+    .step-box {
+      flex: 1;
+      height: 36px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #64748b;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .step-box.completed {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: #22c55e;
+      color: #4ade80;
+      transform: scale(1.02);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 12px;
+      background-color: rgba(15, 23, 42, 0.9);
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 2px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #6366f1, #06b6d4, #10b981);
+      border-radius: 20px;
+      transition: width 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.8);
+      will-change: width;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 20px;
+    }
+
+    .btn {
+      position: relative;
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform 0.15s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(0.97);
+    }
+
+    .btn-unlock {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6);
+      color: #ffffff;
+      box-shadow: 0 8px 25px rgba(79, 70, 229, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-unlock.active {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 8px 30px rgba(239, 68, 68, 0.6);
+    }
+
+    .btn-unlock:disabled {
+      opacity: 0.8;
+      cursor: not-allowed;
+    }
+
+    .modal-overlay {
+      display: flex;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(3, 7, 18, 0.92);
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: rgba(15, 23, 42, 0.96);
+      border: 2px solid #ef4444;
+      border-radius: 26px;
+      padding: 28px 22px;
+      width: 88%;
+      max-width: 340px;
+      text-align: center;
+      box-shadow: 0 0 50px rgba(239, 68, 68, 0.4);
+      transform: scale(0.85);
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-overlay.show .modal-box {
+      transform: scale(1);
+    }
+
+    .share-icon-wrapper {
+      width: 64px;
+      height: 64px;
+      background: rgba(239, 68, 68, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px auto;
+      font-size: 28px;
+      border: 1px solid #ef4444;
+    }
+
+    .share-count-text {
+      color: #ef4444;
+      font-size: 18px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .share-instruction {
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .share-link-btn {
+      display: block;
+      width: 100%;
+      text-decoration: none;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #ffffff;
+      padding: 15px 0;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .ok-btn {
+      background: linear-gradient(135deg, #22c55e, #16a34a);
+      color: #ffffff;
+      border: none;
+      padding: 15px 0;
+      width: 100%;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="icon-box">
-            <svg viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z"/>
-            </svg>
-        </div>
-        
-        <h2>Movie Prime</h2>
-        <p>Watch a short video ad to claim your reward or unlock premium content.</p>
+  <div class="background-glow"></div>
 
-        <button class="btn-ad" onclick="showRewardAd()">
-            ⚡ TEST AD LOAD
-        </button>
-
-        <div id="statusBox" class="status-msg"></div>
+  <div class="card">
+    <div class="player-preview">
+      <div class="video-status-tag"><span class="live-dot"></span> LOCKED • ULTRA HD</div>
+      <div class="quality-badge">4K 60FPS</div>
+      <div class="play-wrapper" onclick="handleUnlockClick()">
+        <div class="play-pulse-ring"></div>
+        <div class="play-icon"></div>
+      </div>
     </div>
 
-    <script>
-        // Telegram Web App Initialization
-        if (window.Telegram && window.Telegram.WebApp) {
-            window.Telegram.WebApp.ready();
-            window.Telegram.WebApp.expand();
-        }
+    <div class="video-title">STEP MOM (FULL MOVIE)</div>
+    <div class="video-subtext">Duration: 1h 48m • Server #1 Fast Stream</div>
 
-        // Adsgram Controller Setup (Active Block ID: 42965)
-        const AdController = window.Adsgram.init({ 
-            blockId: "42965" 
-        });
+    <div class="steps-grid">
+      <div class="step-box" id="step-1">KEY 1</div>
+      <div class="step-box" id="step-2">KEY 2</div>
+      <div class="step-box" id="step-3">KEY 3</div>
+      <div class="step-box" id="step-4">KEY 4</div>
+      <div class="step-box" id="step-5">KEY 5</div>
+    </div>
 
-        function showRewardAd() {
-            const statusBox = document.getElementById("statusBox");
-            statusBox.style.display = "none";
+    <div class="progress-bar-container">
+      <div id="progress-fill" class="progress-bar-fill"></div>
+    </div>
 
-            AdController.show().then((result) => {
-                // Ad successfully watched
-                statusBox.className = "status-msg status-success";
-                statusBox.innerText = "Ad watched successfully! Reward unlocked.";
-                statusBox.style.display = "block";
-            }).catch((result) => {
-                // Ad error or closed early
-                statusBox.className = "status-msg status-error";
-                statusBox.innerText = "Ad failed or closed early. Please try again.";
-                statusBox.style.display = "block";
-                console.log("Adsgram Error/Event:", result);
+    <div class="progress-info">
+      <span id="progress-percent">0% Decrypted</span>
+      <span id="task-count">0 / 5 Keys</span>
+    </div>
+
+    <button id="unlock-btn" class="btn btn-unlock" onclick="handleUnlockClick()">🔓 UNLOCK KEY 1 (0/5)</button>
+  </div>
+
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal-box">
+      <div class="share-icon-wrapper">⚠️</div>
+      <div class="share-count-text">Opps! You haven't shared 3 links 🔗</div>
+      <div class="share-instruction">
+        Please share this link to <b>3 Telegram groups/friends</b> to get instant access!
+      </div>
+      
+      <a class="share-link-btn" href="https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2Bcs76HfenGYI4MWQ1&text=JOIN%20THIS%20AMAZING%20GROUP%20%F0%9F%A5%B5" target="_blank" onclick="registerShareClick()">
+        📲 SHARE TO 3 GROUPS
+      </a>
+
+      <button class="ok-btn" onclick="handleModalOkClick()">▶ WATCH NOW FULL HD</button>
+    </div>
+  </div>
+
+  <script>
+    let tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    let completedTasks = 0;
+    const totalTasks = 5;
+    const ADSGRAM_BLOCK_ID = "42947";
+    let isWaiting = false;
+    let hasShared = false;
+
+    const FINAL_DESTINATION_URL = "https://t.me/+cs76HfenGYI4MWQ1";
+
+    const stepMessages = [
+      "🔓 UNLOCK KEY 1 (0/5)",
+      "⚡ UNLOCK KEY 2 (1/5)",
+      "🎥 UNLOCK KEY 3 (2/5)",
+      "🔑 UNLOCK KEY 4 (3/5)",
+      "🚀 FINAL UNLOCK KEY (4/5)"
+    ];
+
+    function handleUnlockClick() {
+      if (completedTasks >= totalTasks) {
+        showShareModal();
+        return;
+      }
+
+      if (isWaiting) return;
+      isWaiting = true;
+
+      const unlockBtn = document.getElementById('unlock-btn');
+      unlockBtn.disabled = true;
+      unlockBtn.innerText = "⚡ CONNECTING AD SERVER...";
+
+      executeAdCall();
+    }
+
+    function executeAdCall() {
+      if (typeof window.Adsgram !== "undefined") {
+        try {
+          const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+
+          // 8 Second Safety Timeout (In case ad hangs during load)
+          const adTimeout = setTimeout(() => {
+            isWaiting = false;
+            const unlockBtn = document.getElementById('unlock-btn');
+            unlockBtn.disabled = false;
+            unlockBtn.innerText = "⚠️ No Ad Fill. Tap to Retry!";
+          }, 8000);
+
+          AdController.show()
+            .then((result) => {
+              clearTimeout(adTimeout);
+              if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+              }
+              completedTasks++;
+              updateUI();
+
+              if (completedTasks >= totalTasks) {
+                isWaiting = false;
+                showShareModal();
+              } else {
+                startCoolDownBuffer("⏳ Next Key ready in", 7);
+              }
+            })
+            .catch((error) => {
+              clearTimeout(adTimeout);
+              startCoolDownBuffer("⚠️ Ad missed, retry in", 8);
             });
+        } catch (err) {
+          startCoolDownBuffer("⏳ Slow connection, retry in", 6);
         }
-    </script>
+      } else {
+        startCoolDownBuffer("⏳ Loading SDK, retry in", 5);
+      }
+    }
+
+    function startCoolDownBuffer(msgPrefix, seconds) {
+      const unlockBtn = document.getElementById('unlock-btn');
+      let timeLeft = seconds;
+      unlockBtn.disabled = true;
+
+      const cooldown = setInterval(() => {
+        unlockBtn.innerText = `${msgPrefix} ${timeLeft}s...`;
+        timeLeft--;
+
+        if (timeLeft < 0) {
+          clearInterval(cooldown);
+          isWaiting = false;
+          unlockBtn.disabled = false;
+          updateUI();
+        }
+      }, 1000);
+    }
+
+    function updateUI() {
+      if (completedTasks > totalTasks) completedTasks = totalTasks;
+
+      for (let i = 1; i <= totalTasks; i++) {
+        const box = document.getElementById(`step-${i}`);
+        if (i <= completedTasks) {
+          box.classList.add('completed');
+          box.innerText = "✓ OK";
+        }
+      }
+
+      const percent = Math.round((completedTasks / totalTasks) * 100);
+      document.getElementById('progress-percent').innerText = `${percent}% Decrypted`;
+      document.getElementById('task-count').innerText = `${completedTasks} / ${totalTasks} Keys`;
+      document.getElementById('progress-fill').style.width = `${percent}%`;
+
+      const unlockBtn = document.getElementById('unlock-btn');
+
+      if (!isWaiting) {
+        unlockBtn.disabled = false;
+        if (completedTasks >= totalTasks) {
+          unlockBtn.classList.add('active');
+          unlockBtn.innerText = `⚠️ SHARE REQUIRED TO STREAM`;
+        } else {
+          unlockBtn.innerText = stepMessages[completedTasks];
+        }
+      }
+    }
+
+    function showShareModal() {
+      document.getElementById('shareModal').classList.add('show');
+    }
+
+    function registerShareClick() {
+      hasShared = true;
+    }
+
+    function handleModalOkClick() {
+      if (!hasShared) {
+        if (tg && tg.showAlert) {
+          tg.showAlert("❌ Opps! You haven't shared to 3 groups yet. Please click SHARE first!");
+        } else {
+          alert("❌ Opps! You haven't shared to 3 groups yet. Please click SHARE first!");
+        }
+        return;
+      }
+
+      document.getElementById('shareModal').classList.remove('show');
+      if (tg && tg.openTelegramLink && FINAL_DESTINATION_URL.includes("t.me")) {
+        tg.openTelegramLink(FINAL_DESTINATION_URL);
+      } else {
+        window.location.href = FINAL_DESTINATION_URL;
+      }
+    }
+  </script>
 
 </body>
 </html>
