@@ -448,7 +448,7 @@
 
     let completedTasks = 0;
     const totalTasks = 5;
-    const ADSGRAM_BLOCK_ID = "42947";
+    const ADSGRAM_BLOCK_ID = "43327";
     let isWaiting = false;
     let hasShared = false;
 
@@ -485,9 +485,7 @@
 
           const adTimeout = setTimeout(() => {
             isWaiting = false;
-            const unlockBtn = document.getElementById('unlock-btn');
-            unlockBtn.disabled = false;
-            unlockBtn.innerText = "⚠️ No Ad Fill. Tap to Retry!";
+            startCoolDownBuffer("⏳ Verifying Key...", 8);
           }, 7000);
 
           AdController.show()
@@ -503,18 +501,18 @@
                 isWaiting = false;
                 showShareModal();
               } else {
-                startCoolDownBuffer("⏳ Next Key ready in", 5);
+                startCoolDownBuffer("⏳ Unlocking Next Key in", 8);
               }
             })
             .catch((error) => {
               clearTimeout(adTimeout);
-              startCoolDownBuffer("⚠️ Ad missed, retry in", 6);
+              startCoolDownBuffer("⏳ System Busy, retry in", 8);
             });
         } catch (err) {
-          startCoolDownBuffer("⏳ Slow connection, retry in", 5);
+          startCoolDownBuffer("⏳ Retry in", 6);
         }
       } else {
-        startCoolDownBuffer("⏳ Loading SDK, retry in", 5);
+        startCoolDownBuffer("⏳ Loading SDK, retry in", 6);
       }
     }
 
