@@ -181,57 +181,69 @@
     const SHARE_LINK = "https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2BtBz1Jj29kYhmZjY5&text=JOIN%20THIS%20AMAZING%20GROUP%20%F0%9F%A5%B5";
     const FINAL_DESTINATION_URL = "https://t.me/+tBz1Jj29kYhmZjY5";
 
-    function handleTaskClick() {
+    async function handleTaskClick() {
       if (completedTasks >= totalTasks) {
         openFinalLink();
         return;
       }
 
+      const unlockBtn = document.getElementById('unlock-btn');
+      unlockBtn.disabled = true;
+
+      // First click completes step 1
       if (completedTasks === 0) {
         if (tg && tg.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
         completedTasks = 1;
         updateUI();
+        startCooldown(2);
         return;
       }
 
-      executeAdCall();
+      // Show Adsgram Ad
+      await executeAdCall();
     }
 
     function executeAdCall() {
-      const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
+      return new Promise((resolve) => {
+        const unlockBtn = document.getElementById('unlock-btn');
+        unlockBtn.disabled = true;
 
-      if (typeof window.Adsgram !== "undefined") {
-        try {
-          const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+        if (typeof window.Adsgram !== "undefined") {
+          try {
+            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
 
-          AdController.show()
-            .then((result) => {
-              if (tg && tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-              }
-              completedTasks++;
-              updateUI();
-            })
-            .catch((error) => {
-              // Agar Adsgram rate-limit error deta hai toh automatic next step credit kar dega
-              completedTasks++;
-              updateUI();
-              
-              // 5 second ka pause taaki Adsgram server release ho jaye
-              startCooldown(5);
-            });
-        } catch (err) {
+            AdController.show()
+              .then((result) => {
+                if (tg && tg.HapticFeedback) {
+                  tg.HapticFeedback.notificationOccurred('success');
+                }
+                completedTasks++;
+                updateUI();
+                startCooldown(3);
+                resolve();
+              })
+              .catch((error) => {
+                // Ad close ya limit issue par bhi task increment hoga
+                completedTasks++;
+                updateUI();
+                startCooldown(3);
+                resolve();
+              });
+          } catch (err) {
+            completedTasks++;
+            updateUI();
+            startCooldown(3);
+            resolve();
+          }
+        } else {
           completedTasks++;
           updateUI();
-          startCooldown(5);
+          startCooldown(3);
+          resolve();
         }
-      } else {
-        completedTasks++;
-        updateUI();
-      }
+      });
     }
 
     function startCooldown(seconds) {
@@ -247,7 +259,7 @@
           unlockBtn.disabled = false;
           unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
         } else {
-          unlockBtn.innerText = `WAIT ${timeLeft}s... (${completedTasks}/${totalTasks})`;
+          unlockBtn.innerText = `NEXT TASK IN ${timeLeft}s... (${completedTasks}/${totalTasks})`;
           timeLeft--;
         }
       }, 1000);
@@ -268,9 +280,6 @@
         unlockBtn.disabled = false;
         unlockBtn.classList.add('completed');
         unlockBtn.innerText = "▶ WATCH FULL VIDEO NOW";
-      } else {
-        unlockBtn.disabled = false;
-        unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
       }
     }
 
