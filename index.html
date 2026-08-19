@@ -177,14 +177,12 @@
     let completedTasks = 0;
     const totalTasks = 6;
 
-    // Dono Block IDs Yahan Set Hai
+    // Updated Block IDs
     const BLOCK_ID_1 = "43327";
     const BLOCK_ID_2 = "43334";
 
-    // startapp parameter fetch करना (?startapp=2 या ?startapp=10)
     let startParam = tg?.initDataUnsafe?.start_param || "default";
 
-    // Dynamic Titles & Links Map
     const GROUP_CONFIG = {
       "2": {
         title: "GROUP 2 SPECIAL LOCKED",
@@ -231,7 +229,6 @@
     }
 
     function executeAdCall() {
-      // Automatic Block ID Alternator
       const activeBlockId = (completedTasks % 2 !== 0) ? BLOCK_ID_1 : BLOCK_ID_2;
 
       if (typeof window.Adsgram !== "undefined") {
