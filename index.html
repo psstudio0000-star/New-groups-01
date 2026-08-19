@@ -1,314 +1,204 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>grpbot</title>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Movie Prime - Premium Collection</title>
+  
   <!-- Telegram Web App SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <!-- Adsgram SDK -->
-  <script id="adsgram-script" src="https://sad.adsgram.ai/js/sad.min.js"></script>
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: #03060d;
-      color: #ffffff;
+      background-color: #0f172a;
+      color: #f8fafc;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      padding: 16px;
+      padding: 20px 15px;
     }
 
-    .card {
-      background: #0b0f19;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 28px;
-      padding: 32px 22px;
+    .container {
       width: 100%;
-      max-width: 360px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.9);
+      max-width: 480px;
       text-align: center;
     }
 
-    .card-title {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #ffffff;
-      letter-spacing: 0.6px;
-      margin-bottom: 24px;
-      text-transform: uppercase;
+    .header {
+      margin-bottom: 25px;
     }
 
-    .progress-bar-bg {
-      width: 100%;
-      height: 16px;
-      background: #131a29;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-bottom: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      position: relative;
+    .header h1 {
+      font-size: 24px;
+      color: #38bdf8;
+      margin-bottom: 8px;
     }
 
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #1d4ed8, #3b82f6, #60a5fa);
-      background-size: 200% 100%;
-      border-radius: 20px;
-      transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 0 15px rgba(59, 130, 246, 0.8), inset 0 0 8px rgba(255, 255, 255, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.55),
-        transparent
-      );
-      animation: shimmer 1.8s infinite;
-    }
-
-    @keyframes shimmer {
-      0% { left: -100%; }
-      100% { left: 100%; }
-    }
-
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.85rem;
-      font-weight: 600;
+    .header p {
+      font-size: 14px;
       color: #94a3b8;
-      margin-bottom: 28px;
     }
 
-    .btn-group {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 16px;
-      border: none;
+    /* Join Group Button Box */
+    .group-card {
+      background: #1e293b;
+      border: 1px solid #334155;
       border-radius: 16px;
-      font-size: 0.95rem;
-      font-weight: 800;
-      letter-spacing: 0.5px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .join-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 0;
+      background: linear-gradient(135deg, #ff416c, #ff4b2b);
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(255, 65, 108, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .join-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* Ads Section */
+    .ad-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .ad-card h3 {
+      font-size: 16px;
+      color: #f1f5f9;
+      margin-bottom: 12px;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 14px 0;
+      border: none;
+      border-radius: 10px;
+      background: #0284c7;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.1s ease, background 0.2s ease;
+      transition: background 0.2s;
     }
 
-    .btn:active:not(:disabled) {
-      transform: scale(0.97);
+    .action-btn:active {
+      background: #0369a1;
     }
 
-    .btn-share {
-      background: #1d75f2;
-      color: #ffffff;
-      box-shadow: 0 4px 15px rgba(29, 117, 242, 0.3);
+    .status-msg {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #cbd5e1;
+      min-height: 18px;
     }
 
-    .btn-unlock {
-      background: #162032;
-      color: #ffffff;
-    }
-
-    .btn-unlock.completed {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-    }
-
-    .btn:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
+    .footer {
+      margin-top: auto;
+      font-size: 12px;
+      color: #64748b;
+      padding-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <div id="card-title" class="card-title">SLEEPY SISTER IS LOCKED</div>
-
-    <div class="progress-bar-bg">
-      <div id="progress-fill" class="progress-bar-fill"></div>
+  <div class="container">
+    <div class="header">
+      <h1>Movie Prime</h1>
+      <p>Watch Ads & Get Instant Group Links</p>
     </div>
 
-    <div class="progress-meta">
-      <span id="percent-text">0% Completed</span>
-      <span id="tasks-text">0 / 6 Tasks</span>
+    <!-- Group Join Section -->
+    <div class="group-card">
+      <a href="https://t.me/+tBz1Jj29kYhmZjY5" target="_blank" class="join-btn">
+        🔥 JOIN THIS AMAZING GROUP 🥵
+      </a>
     </div>
 
-    <div class="btn-group">
-      <button class="btn btn-share" onclick="handleShare()">SHARE</button>
-      <button id="unlock-btn" class="btn btn-unlock" onclick="handleTaskClick()">UNLOCK VIDEOS (0/6)</button>
+    <!-- Ad Block 1 -->
+    <div class="ad-card">
+      <h3>Unlock Server 1 Link</h3>
+      <button class="action-btn" onclick="showAd('1')">Watch Ad to Unlock</button>
+      <div id="status-1" class="status-msg"></div>
+    </div>
+
+    <!-- Ad Block 2 -->
+    <div class="ad-card">
+      <h3>Unlock Server 2 Link</h3>
+      <button class="action-btn" onclick="showAd('2')">Watch Ad to Unlock</button>
+      <div id="status-2" class="status-msg"></div>
+    </div>
+
+    <div class="footer">
+      Powered by Adsgram Monetization Platform
     </div>
   </div>
 
   <script>
-    let tg = window.Telegram?.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
+    // Initialize Telegram WebApp
+    const tg = window.Telegram.WebApp;
+    tg.ready();
+    tg.expand();
 
-    let completedTasks = 0;
-    const totalTasks = 6;
-
-    // Updated Block IDs
-    const BLOCK_ID_1 = "43327";
-    const BLOCK_ID_2 = "43334";
-
-    let startParam = tg?.initDataUnsafe?.start_param || "default";
-
-    const GROUP_CONFIG = {
-      "2": {
-        title: "GROUP 2 SPECIAL LOCKED",
-        link: "https://t.me/+cs76HfenGYI4MWQ1"
-      },
-      "10": {
-        title: "GROUP 10 PREMIUM LOCKED",
-        link: "https://t.me/+cs76HfenGYI4MWQ1"
-      },
-      "default": {
-        title: "SLEEPY SISTER IS LOCKED",
-        link: "https://t.me/+cs76HfenGYI4MWQ1"
-      }
+    // Configuration - Updated Adsgram Block IDs
+    const CONFIG = {
+      BLOCK_ID_1: "43334", // Nayi Block ID set kar di gayi hai
+      BLOCK_ID_2: "43334"  // Agli ID alag ho toh yahan update kar sakte hain
     };
 
-    const currentConfig = GROUP_CONFIG[startParam] || GROUP_CONFIG["default"];
-    const FINAL_DESTINATION_URL = currentConfig.link;
+    // Show Ad Function
+    function showAd(blockNum) {
+      const blockId = blockNum === '1' ? CONFIG.BLOCK_ID_1 : CONFIG.BLOCK_ID_2;
+      const statusElement = document.getElementById(`status-${blockNum}`);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("card-title").innerText = currentConfig.title;
-    });
-
-    const SHARE_LINK = "https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2Bcs76HfenGYI4MWQ1&text=Watch%20HD%20Videos";
-
-    function handleTaskClick() {
-      if (completedTasks >= totalTasks) {
-        openFinalLink();
+      if (!blockId) {
+        statusElement.style.color = "#ef4444";
+        statusElement.innerText = "Error: Block ID available nahi hai!";
         return;
       }
 
-      if (completedTasks === 0) {
-        if (tg && tg.HapticFeedback) {
-          tg.HapticFeedback.notificationOccurred('success');
-        }
-        completedTasks = 1;
-        updateUI();
-        startCooldown(3);
-        return;
-      }
+      statusElement.style.color = "#cbd5e1";
+      statusElement.innerText = "Ad Loading...";
 
-      const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
-      executeAdCall();
-    }
+      // Adsgram Controller Init
+      const AdController = window.Adsgram.init({ blockId: blockId });
 
-    function executeAdCall() {
-      const activeBlockId = (completedTasks % 2 !== 0) ? BLOCK_ID_1 : BLOCK_ID_2;
-
-      if (typeof window.Adsgram !== "undefined") {
-        try {
-          const AdController = window.Adsgram.init({ blockId: activeBlockId });
-
-          AdController.show()
-            .then((result) => {
-              if (tg && tg.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
-              }
-              completedTasks++;
-              updateUI();
-              startCooldown(4);
-            })
-            .catch((error) => {
-              updateUI();
-              startCooldown(3);
-            });
-        } catch (err) {
-          updateUI();
-          startCooldown(3);
-        }
-      } else {
-        updateUI();
-        startCooldown(3);
-      }
-    }
-
-    function startCooldown(seconds) {
-      if (completedTasks >= totalTasks) return;
-
-      const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
-      let timeLeft = seconds;
-
-      const timer = setInterval(() => {
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          unlockBtn.disabled = false;
-          unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
-        } else {
-          unlockBtn.innerText = `WAIT ${timeLeft}s... (${completedTasks}/${totalTasks})`;
-          timeLeft--;
-        }
-      }, 1000);
-    }
-
-    function updateUI() {
-      if (completedTasks > totalTasks) completedTasks = totalTasks;
-
-      const percent = Math.round((completedTasks / totalTasks) * 100);
-      
-      document.getElementById('percent-text').innerText = `${percent}% Completed`;
-      document.getElementById('tasks-text').innerText = `${completedTasks} / ${totalTasks} Tasks`;
-      document.getElementById('progress-fill').style.width = `${percent}%`;
-
-      const unlockBtn = document.getElementById('unlock-btn');
-
-      if (completedTasks >= totalTasks) {
-        unlockBtn.disabled = false;
-        unlockBtn.classList.add('completed');
-        unlockBtn.innerText = "▶ WATCH FULL VIDEO NOW";
-      }
-    }
-
-    function handleShare() {
-      if (tg && tg.openTelegramLink) {
-        tg.openTelegramLink(SHARE_LINK);
-      } else {
-        window.open(SHARE_LINK, '_blank');
-      }
-    }
-
-    function openFinalLink() {
-      if (tg && tg.openTelegramLink && FINAL_DESTINATION_URL.includes("t.me")) {
-        tg.openTelegramLink(FINAL_DESTINATION_URL);
-      } else {
-        window.location.href = FINAL_DESTINATION_URL;
-      }
+      AdController.show().then((result) => {
+        // Ad Success Callback
+        statusElement.style.color = "#22c55e";
+        statusElement.innerText = "✅ Reward Unlocked! Group link activated.";
+      }).catch((result) => {
+        // Ad Error/Cancel Callback
+        statusElement.style.color = "#ef4444";
+        statusElement.innerText = "❌ Ad complete nahi hua. Dobara try karein.";
+      });
     }
   </script>
 
