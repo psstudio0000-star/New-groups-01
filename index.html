@@ -187,18 +187,15 @@
         return;
       }
 
-      // Step 1: Pehla click (1/6) fast unlock bina ad ke
       if (completedTasks === 0) {
         if (tg && tg.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
         completedTasks = 1;
         updateUI();
-        startCooldown(3); // Adsgram rate limit se bachne ke liye 3 sec delay
         return;
       }
 
-      // Step 2-6: Trigger Adsgram
       executeAdCall();
     }
 
@@ -217,23 +214,23 @@
               }
               completedTasks++;
               updateUI();
-              startCooldown(4); // Ad ke baad 4 sec break taaki error na aaye
             })
             .catch((error) => {
-              // Yahan catch mein error handled hai (Jaise "too often" error aane par task complete ho jaye)
+              // Agar Adsgram rate-limit error deta hai toh automatic next step credit kar dega
               completedTasks++;
               updateUI();
-              startCooldown(4);
+              
+              // 5 second ka pause taaki Adsgram server release ho jaye
+              startCooldown(5);
             });
         } catch (err) {
           completedTasks++;
           updateUI();
-          startCooldown(3);
+          startCooldown(5);
         }
       } else {
         completedTasks++;
         updateUI();
-        startCooldown(3);
       }
     }
 
@@ -250,7 +247,7 @@
           unlockBtn.disabled = false;
           unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
         } else {
-          unlockBtn.innerText = `PLEASE WAIT ${timeLeft}s... (${completedTasks}/${totalTasks})`;
+          unlockBtn.innerText = `WAIT ${timeLeft}s... (${completedTasks}/${totalTasks})`;
           timeLeft--;
         }
       }, 1000);
@@ -271,6 +268,9 @@
         unlockBtn.disabled = false;
         unlockBtn.classList.add('completed');
         unlockBtn.innerText = "▶ WATCH FULL VIDEO NOW";
+      } else {
+        unlockBtn.disabled = false;
+        unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
       }
     }
 
