@@ -187,24 +187,22 @@
         return;
       }
 
-      // Step 1: Direct 17% without ad
+      // Step 1: Pehla click seedha Task 1 complete kar dega
       if (completedTasks === 0) {
         if (tg && tg.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
         completedTasks = 1;
         updateUI();
-        autoLoadNextAd(5); // 5 sec wait timer then auto run
         return;
       }
 
-      // Step 2 onwards: Show Adsgram Ad
+      // Step 2 onwards: Direct Tap par Adsgram Ad show hoga
       executeAdCall();
     }
 
     function executeAdCall() {
       const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
 
       if (typeof window.Adsgram !== "undefined") {
         try {
@@ -217,39 +215,20 @@
               }
               completedTasks++;
               updateUI();
-              autoLoadNextAd(5); // Ad complete hone par auto load 5s delay
             })
             .catch((error) => {
+              // Ad close/fail hone par bhi task progress count hoga
+              completedTasks++;
               updateUI();
-              autoLoadNextAd(5); // Fail/Close hone par bhi auto load 5s
             });
         } catch (err) {
+          completedTasks++;
           updateUI();
-          autoLoadNextAd(5);
         }
       } else {
+        completedTasks++;
         updateUI();
-        autoLoadNextAd(5);
       }
-    }
-
-    function autoLoadNextAd(seconds) {
-      if (completedTasks >= totalTasks) return;
-
-      const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
-      let timeLeft = seconds;
-
-      const timer = setInterval(() => {
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          // 5 Seconds complete hote hi automatic next ad call kar dega
-          executeAdCall();
-        } else {
-          unlockBtn.innerText = `LOADING NEXT AD IN ${timeLeft}s... (${completedTasks}/${totalTasks})`;
-          timeLeft--;
-        }
-      }, 1000);
     }
 
     function updateUI() {
@@ -267,6 +246,9 @@
         unlockBtn.disabled = false;
         unlockBtn.classList.add('completed');
         unlockBtn.innerText = "▶ WATCH FULL VIDEO NOW";
+      } else {
+        unlockBtn.disabled = false;
+        unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
       }
     }
 
