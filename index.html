@@ -181,69 +181,57 @@
     const SHARE_LINK = "https://t.me/share/url?url=https%3A%2F%2Ft.me%2F%2BtBz1Jj29kYhmZjY5&text=JOIN%20THIS%20AMAZING%20GROUP%20%F0%9F%A5%B5";
     const FINAL_DESTINATION_URL = "https://t.me/+tBz1Jj29kYhmZjY5";
 
-    async function handleTaskClick() {
+    function handleTaskClick() {
       if (completedTasks >= totalTasks) {
         openFinalLink();
         return;
       }
 
-      const unlockBtn = document.getElementById('unlock-btn');
-      unlockBtn.disabled = true;
-
-      // First click completes step 1
+      // Step 1: Direct 17% without ad
       if (completedTasks === 0) {
         if (tg && tg.HapticFeedback) {
           tg.HapticFeedback.notificationOccurred('success');
         }
         completedTasks = 1;
         updateUI();
-        startCooldown(2);
+        startCooldown(3); // 3 sec quick delay before 2nd task
         return;
       }
 
-      // Show Adsgram Ad
-      await executeAdCall();
+      // Step 2 onwards: Show Adsgram Ad
+      const unlockBtn = document.getElementById('unlock-btn');
+      unlockBtn.disabled = true;
+      executeAdCall();
     }
 
     function executeAdCall() {
-      return new Promise((resolve) => {
-        const unlockBtn = document.getElementById('unlock-btn');
-        unlockBtn.disabled = true;
+      const unlockBtn = document.getElementById('unlock-btn');
 
-        if (typeof window.Adsgram !== "undefined") {
-          try {
-            const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+      if (typeof window.Adsgram !== "undefined") {
+        try {
+          const AdController = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
 
-            AdController.show()
-              .then((result) => {
-                if (tg && tg.HapticFeedback) {
-                  tg.HapticFeedback.notificationOccurred('success');
-                }
-                completedTasks++;
-                updateUI();
-                startCooldown(3);
-                resolve();
-              })
-              .catch((error) => {
-                // Ad close ya limit issue par bhi task increment hoga
-                completedTasks++;
-                updateUI();
-                startCooldown(3);
-                resolve();
-              });
-          } catch (err) {
-            completedTasks++;
-            updateUI();
-            startCooldown(3);
-            resolve();
-          }
-        } else {
-          completedTasks++;
+          AdController.show()
+            .then((result) => {
+              if (tg && tg.HapticFeedback) {
+                tg.HapticFeedback.notificationOccurred('success');
+              }
+              completedTasks++;
+              updateUI();
+              startCooldown(5); // 5 sec cooldown to prevent Adsgram limit error
+            })
+            .catch((error) => {
+              updateUI();
+              startCooldown(3);
+            });
+        } catch (err) {
           updateUI();
           startCooldown(3);
-          resolve();
         }
-      });
+      } else {
+        updateUI();
+        startCooldown(3);
+      }
     }
 
     function startCooldown(seconds) {
@@ -259,7 +247,7 @@
           unlockBtn.disabled = false;
           unlockBtn.innerText = `UNLOCK VIDEOS (${completedTasks}/${totalTasks})`;
         } else {
-          unlockBtn.innerText = `NEXT TASK IN ${timeLeft}s... (${completedTasks}/${totalTasks})`;
+          unlockBtn.innerText = `WAIT ${timeLeft}s... (${completedTasks}/${totalTasks})`;
           timeLeft--;
         }
       }, 1000);
@@ -301,4 +289,4 @@
   </script>
 
 </body>
-</html>
+</html> 
